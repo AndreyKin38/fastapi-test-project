@@ -2,7 +2,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DB_DRIVER = "postgresql+psycopg2"
     DB_HOST: str = "0.0.0.0"
     DB_PORT: int = 5437
     DB_USER: str = 'postgres'
@@ -15,7 +14,7 @@ class Settings(BaseSettings):
 
     @property
     def db_url(self):
-        return f"{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
 
