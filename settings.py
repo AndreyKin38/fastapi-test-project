@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     CACHE_PORT: int = 6379
     CACHE_NAME: int = 0
 
+    JWT_SECRET_KEY: str = 'secret_key'
+    JWT_ALGORITHM: str = 'HS256'
+
     @property
     def db_url(self):
         return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
