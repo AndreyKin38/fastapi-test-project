@@ -4,12 +4,18 @@ from sqlalchemy.orm import Session
 from dataclasses import dataclass
 
 from models import UserProfile
-from schemas import UserLoginSchema
+from schemas import UserLoginSchema, UserCreateSchema
 
 
 @dataclass
 class UserRepository:
     db_session: Session
+
+    def get_user_by_email(self, email: str) -> UserProfile | None:
+        query = select(UserProfile).where(UserProfile.email == email)
+        with self.db_session() as session:
+            user: UserProfile = session.execute(query).scalar_one_or_none()
+            return user
 
     def get_user(self, user_id: int) -> UserProfile | None:
         query = select(UserProfile).where(UserProfile.id == user_id)
@@ -17,11 +23,11 @@ class UserRepository:
             user: UserProfile = session.execute(query).scalar_one_or_none()
             return user
 
-    def create_user(self, username: str, password: str) -> UserProfile:
+    def create_user(self, user: UserCreateSchema) -> UserProfile:
         query = insert(UserProfile).values(
-            username=username,
-            password=password
+            **user.dict(exclude_none=True)
         ).returning(UserProfile.id)
+
         with self.db_session() as session:
             user_id: int = session.execute(query).scalar()
             session.commit()

@@ -4,9 +4,10 @@ from datetime import timedelta, datetime
 
 from jose import jwt, JWTError
 
+from client import GoogleClient
 from exception import UserNotFoundException, PasswordErrorException, TokenExpiredException, IncorrectTokenException
 from models import UserProfile
-from schemas import UserLoginSchema
+from schemas import UserLoginSchema, UserCreateSchema
 from repository import UserRepository
 from settings import Settings
 
@@ -15,6 +16,26 @@ from settings import Settings
 class AuthService:
     user_repository: UserRepository
     settings: Settings
+    google_client: GoogleClient
+
+    def google_auth(self, code: str):
+        user_data = self.google_client.get_user_info(code)
+
+        if user := self.user_repository.get_user_by_email(email=user_data.email):
+            access_token = self.generate_access_token(user_id=user.id)
+            return UserLoginSchema(user_id=user.id, access_token=access_token)
+
+        user_data_object = UserCreateSchema(
+            google_access_token=user_data.access_token,
+            email=user_data.email,
+            name=user_data.name
+        )
+        created_user = self.user_repository.create_user(user_data_object)
+        access_token = self.generate_access_token(user_id=created_user.id)
+        return UserLoginSchema(user_id=created_user.id, access_token=access_token)
+
+    def get_google_redirect_url(self) -> str:
+        return self.settings.google_redirect_url
 
     def login(self, username: str, password: str) -> UserLoginSchema:
         user = self.user_repository.get_user_by_username(username=username)
@@ -52,5 +73,7 @@ class AuthService:
             raise IncorrectTokenException
 
         return payload['user_id']
+
+
 
 

@@ -75,7 +75,6 @@ async def delete_task(
         )
 
 
-
 @router.get("/task")
 async def get_task(task_id: int) -> TaskSchema:
     pass
