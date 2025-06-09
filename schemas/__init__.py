@@ -1,6 +1,6 @@
 from schemas.task import TaskSchema, Categories, TaskCreateSchema
 from schemas.user import UserLoginSchema, UserCreateSchema
-from schemas.auth import GoogleUserData
+from schemas.auth import GoogleUserData, YandexUserData
 
 __all__ = [
     "TaskSchema",
@@ -8,6 +8,7 @@ __all__ = [
     "UserLoginSchema",
     "UserCreateSchema",
     "TaskCreateSchema",
-    "GoogleUserData"
+    "GoogleUserData",
+    "YandexUserData"
 ]
 
