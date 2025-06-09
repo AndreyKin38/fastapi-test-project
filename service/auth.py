@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 
 from jose import jwt, JWTError
 
-from client import GoogleClient
+from client import GoogleClient, YandexClient
 from exception import UserNotFoundException, PasswordErrorException, TokenExpiredException, IncorrectTokenException
 from models import UserProfile
 from schemas import UserLoginSchema, UserCreateSchema
@@ -17,6 +17,7 @@ class AuthService:
     user_repository: UserRepository
     settings: Settings
     google_client: GoogleClient
+    yandex_client: YandexClient
 
     def google_auth(self, code: str):
         user_data = self.google_client.get_user_info(code)
@@ -36,6 +37,25 @@ class AuthService:
 
     def get_google_redirect_url(self) -> str:
         return self.settings.google_redirect_url
+
+    def yandex_auth(self, code: str):
+        user_data = self.yandex_client.get_user_info(code=code)
+
+        if user := self.user_repository.get_user_by_email(email=user_data.default_email):
+            access_token = self.generate_access_token(user_id=user.id)
+            return UserLoginSchema(user_id=user.id, access_token=access_token)
+
+        user_data_object = UserCreateSchema(
+            yandex_access_token=user_data.access_token,
+            email=user_data.default_email,
+            name=user_data.name
+        )
+        created_user = self.user_repository.create_user(user_data_object)
+        access_token = self.generate_access_token(user_id=created_user.id)
+        return UserLoginSchema(user_id=created_user.id, access_token=access_token)
+
+    def get_yandex_redirect_url(self) -> str:
+        return self.settings.yandex_redirect_url
 
     def login(self, username: str, password: str) -> UserLoginSchema:
         user = self.user_repository.get_user_by_username(username=username)

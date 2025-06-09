@@ -13,6 +13,7 @@ class UserCreateSchema(BaseModel):
     name: str | None = None
     verified_email: str | None = None
     google_access_token: str | None = None
+    yandex_access_token: str | None = None
 
 
 
