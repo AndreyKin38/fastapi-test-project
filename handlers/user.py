@@ -14,7 +14,7 @@ async def create_user(
         body: UserCreateSchema,
         user_service: Annotated[UserService, Depends(get_user_service)]
 ) -> UserLoginSchema:
-    return user_service.create_user(
+    return await user_service.create_user(
         username=body.username,
         password=body.password
     )
