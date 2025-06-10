@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from handlers import ping_router, tasks_router, user_router, auth_router
+from handlers import routers
 
 app = FastAPI()
 
-for router in [tasks_router, ping_router, user_router, auth_router]:
+for router in routers:
     app.include_router(router=router)
 
 
