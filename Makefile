@@ -4,7 +4,7 @@ HOST ?= 0.0.0.0
 PORT ?= 8000
 
 run:
-	uvicorn main:app --host $(HOST) --port $(PORT) --reload --env-file $(ENV)
+	uvicorn app.main:app --host $(HOST) --port $(PORT) --reload --env-file $(ENV)
 
 install:
 	poetry add $(LIBRARY)
